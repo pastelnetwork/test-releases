@@ -137,10 +137,34 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.2
+          docker_layer_caching: true
       - run:
           name: Install github-release
           command: |
             GO111MODULE=off go get github.com/github-release/github-release
+      - run:
+          name: Install xgo
+          command: |
+            go install -v github.com/pastelnetwork/xgo@48be1f35b934924c998997a8470ffdb6a022b968
+      - run:
+          name: Cross-compile with xgo
+          command: |
+            export SOURCES_CONTAINER_NAME=sourcesContainer
+            export XGO_BUILD_CONTAINER_NAME=xgoBuild
+            docker create -v /source --name $SOURCES_CONTAINER_NAME ubuntu:18.04 /bin/true
+            docker cp ./. $SOURCES_CONTAINER_NAME:/source
+            GOPATH= xgo -go go-1.16.x --targets=linux/amd64,darwin-10.14/amd64,windows/amd64,  -moduleSubDir=pqsignatures -pkg=cmd/pqsignatures -volumesFrom=$SOURCES_CONTAINER_NAME -dockerRM=false -dockerContainerName=$XGO_BUILD_CONTAINER_NAME ./
+
+            mkdir -p build
+            docker cp $XGO_BUILD_CONTAINER_NAME:/build/. ./build
+            ls -R ./build
+      - run:
+          name: Upload pqsignatures-darwin-10.14-amd64 to GitHub
+          working_directory: ~/project/build/github.com/pastelnetwork/gonode
+          command: |
+            github-release upload --user pastelnetwork --repo gonode --tag $CIRCLE_TAG --name pqsignatures-darwin-amd64 --file pqsignatures-darwin-10.14-amd64
       - release:
           package: "walletnode"
       - release:
