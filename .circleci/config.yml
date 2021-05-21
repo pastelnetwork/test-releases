@@ -84,7 +84,7 @@ commands:
       - release-os:
           package: << parameters.package >>
           goos: "windows"
-  createSourcesContainer:
+  create-sources-container:
     parameters:
       containerName:
         type: string
@@ -94,7 +94,7 @@ commands:
         command: |
           docker create -v /source --name << parameters.containerName >> ubuntu:18.04 /bin/true
           docker cp ./. << parameters.containerName >>:/source
-  xgoBuild:
+  xgo-build:
     parameters:
       sourcesContainerName:
         type: string
@@ -179,9 +179,9 @@ jobs:
           name: Install xgo
           command: |
             go install -v github.com/pastelnetwork/xgo@48be1f35b934924c998997a8470ffdb6a022b968
-      - createSourcesContainer:
+      - create-sources-container:
           containerName: "sourcesContainer"
-      - xgoBuild:
+      - xgo-build:
           sourcesContainerName: "sourcesContainer"
           buildContainerName: "pqsignatures"
           moduleSubDir: "pqsignatures"
