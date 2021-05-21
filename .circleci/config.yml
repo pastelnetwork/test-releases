@@ -70,7 +70,7 @@ commands:
           working_directory: ~/project/<< parameters.package >>
           command: |
             github-release upload --user pastelnetwork --repo test-releases --tag $CIRCLE_TAG --name << parameters.package >>-<< parameters.goos >>-amd64 --file bin/<< parameters.package >>-<< parameters.goos >>-amd64
-  
+
   release:
     parameters:
       package:
@@ -88,14 +88,14 @@ commands:
 
   create-sources-container:
     parameters:
-      container-name:
+      containerName:
         type: string
     steps:
       - run:
-        name: "Create named docker container << parameters.containerName >> with project's sources"
-        command: |
-          docker create -v /source --name << parameters.containerName >> ubuntu:18.04 /bin/true
-          docker cp ./. << parameters.containerName >>:/source
+          name: "Create named docker container << parameters.containerName >> with project's sources"
+          command: |
+            docker create -v /source --name << parameters.containerName >> ubuntu:18.04 /bin/true
+            docker cp ./. << parameters.containerName >>:/source
 
   xgo-build:
     parameters:
@@ -113,13 +113,13 @@ commands:
         type: string
     steps:
       - run:
-        name: "<< parameters.package >>: xgo build for << parameters.targets >>"
-        command: |
-          GOPATH= xgo -go go-1.16.x --targets=<< parameters.targets >>  -moduleSubDir=<< parameters.moduleSubDir >> -pkg=<< parameters.package >> -volumesFrom=<< parameters.sourcesContainerName >> -dockerRM=false -dockerContainerName=<< parameters.buildContainerName >> ./
+          name: "<< parameters.package >>: xgo build for << parameters.targets >>"
+          command: |
+            GOPATH= xgo -go go-1.16.x --targets=<< parameters.targets >>  -moduleSubDir=<< parameters.moduleSubDir >> -pkg=<< parameters.package >> -volumesFrom=<< parameters.sourcesContainerName >> -dockerRM=false -dockerContainerName=<< parameters.buildContainerName >> ./
 
-          mkdir -p << parameters.outputDirectory >>
-          docker cp << parameters.buildContainerName >>:/build/. ./<< parameters.outputDirectory >>
-          ls -R ./<< parameters.outputDirectory >>
+            mkdir -p << parameters.outputDirectory >>
+            docker cp << parameters.buildContainerName >>:/build/. ./<< parameters.outputDirectory >>
+            ls -R ./<< parameters.outputDirectory >>
 
   github-release:
     parameters:
@@ -133,10 +133,10 @@ commands:
         type: string
     steps:
       - run:
-        name: Upload << parameters.uploadFilePath >> to GitHub
-        working_directory: << parameters.working_directory >>
-        command: |
-          github-release upload --user pastelnetwork --repo << parameters.repo >> --tag $CIRCLE_TAG --name << parameters.publishFileName >> --file << parameters.uploadFilePath >>
+          name: Upload << parameters.uploadFilePath >> to GitHub
+          working_directory: << parameters.working_directory >>
+          command: |
+            github-release upload --user pastelnetwork --repo << parameters.repo >> --tag $CIRCLE_TAG --name << parameters.publishFileName >> --file << parameters.uploadFilePath >>
 
 jobs:
   # Run automated tests
@@ -184,7 +184,7 @@ jobs:
           command: |
             go install -v github.com/pastelnetwork/xgo@48be1f35b934924c998997a8470ffdb6a022b968
       - create-sources-container:
-          container-name: "sourcesContainer"
+          containerName: "sourcesContainer"
       - xgo-build:
           sourcesContainerName: "sourcesContainer"
           buildContainerName: "pqsignatures"
