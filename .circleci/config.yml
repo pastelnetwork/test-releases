@@ -86,7 +86,7 @@ commands:
           goos: "windows"
   create-sources-container:
     parameters:
-      containerName:
+      container-name:
         type: string
     steps:
       - run:
@@ -180,7 +180,7 @@ jobs:
           command: |
             go install -v github.com/pastelnetwork/xgo@48be1f35b934924c998997a8470ffdb6a022b968
       - create-sources-container:
-          containerName: "sourcesContainer"
+          container-name: "sourcesContainer"
       - xgo-build:
           sourcesContainerName: "sourcesContainer"
           buildContainerName: "pqsignatures"
