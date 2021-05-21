@@ -70,6 +70,7 @@ commands:
           working_directory: ~/project/<< parameters.package >>
           command: |
             github-release upload --user pastelnetwork --repo test-releases --tag $CIRCLE_TAG --name << parameters.package >>-<< parameters.goos >>-amd64 --file bin/<< parameters.package >>-<< parameters.goos >>-amd64
+  
   release:
     parameters:
       package:
@@ -84,6 +85,7 @@ commands:
       - release-os:
           package: << parameters.package >>
           goos: "windows"
+
   create-sources-container:
     parameters:
       container-name:
@@ -94,6 +96,7 @@ commands:
         command: |
           docker create -v /source --name << parameters.containerName >> ubuntu:18.04 /bin/true
           docker cp ./. << parameters.containerName >>:/source
+
   xgo-build:
     parameters:
       sourcesContainerName:
@@ -117,6 +120,7 @@ commands:
           mkdir -p << parameters.outputDirectory >>
           docker cp << parameters.buildContainerName >>:/build/. ./<< parameters.outputDirectory >>
           ls -R ./<< parameters.outputDirectory >>
+
   github-release:
     parameters:
       working_directory:
