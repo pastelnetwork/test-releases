@@ -189,10 +189,10 @@ jobs:
           targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
           outputDirectory: "build"
       - github-release:
-        working_directory: "~/project/build/github.com/pastelnetwork/gonode"
-        uploadFilePath: "pqsignatures-darwin-10.14-amd64"
-        publishFileName: "pqsignatures-darwin-amd64"
-        repo: "test-releases"
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          uploadFilePath: "pqsignatures-darwin-10.14-amd64"
+          publishFileName: "pqsignatures-darwin-amd64"
+          repo: "test-releases"
 
 workflows:
   build-and-test:
