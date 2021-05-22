@@ -69,7 +69,8 @@ commands:
           name: "<< parameters.package >>: Upload << parameters.package >>-<< parameters.goos >>-amd64 to GitHub"
           working_directory: ~/project/<< parameters.package >>
           command: |
-            github-release upload --user pastelnetwork --repo gonode --tag $CIRCLE_TAG --name << parameters.package >>-<< parameters.goos >>-amd64 --file bin/<< parameters.package >>-<< parameters.goos >>-amd64
+            github-release upload --user pastelnetwork --repo test-releases --tag $CIRCLE_TAG --name << parameters.package >>-<< parameters.goos >>-amd64 --file bin/<< parameters.package >>-<< parameters.goos >>-amd64
+
   release:
     parameters:
       package:
@@ -84,6 +85,58 @@ commands:
       - release-os:
           package: << parameters.package >>
           goos: "windows"
+
+  create-sources-container:
+    parameters:
+      containerName:
+        type: string
+    steps:
+      - run:
+          name: "Create named docker container << parameters.containerName >> with project's sources"
+          command: |
+            docker create -v /source --name << parameters.containerName >> ubuntu:18.04 /bin/true
+            docker cp ./. << parameters.containerName >>:/source
+
+  xgo-build:
+    parameters:
+      sourcesContainerName:
+        type: string
+      buildContainerName:
+        type: string
+      moduleSubDir:
+        type: string
+      package:
+        type: string
+      targets:
+        type: string
+      outputDirectory:
+        type: string
+    steps:
+      - run:
+          name: "<< parameters.package >>: xgo build for << parameters.targets >>"
+          command: |
+            GOPATH= xgo -go go-1.16.x --targets=<< parameters.targets >>  -moduleSubDir=<< parameters.moduleSubDir >> -pkg=<< parameters.package >> -volumesFrom=<< parameters.sourcesContainerName >> -dockerRM=false -dockerContainerName=<< parameters.buildContainerName >> ./
+
+            mkdir -p << parameters.outputDirectory >>
+            docker cp << parameters.buildContainerName >>:/build/. ./<< parameters.outputDirectory >>
+            ls -R ./<< parameters.outputDirectory >>
+
+  github-release:
+    parameters:
+      working_directory:
+        type: string
+      uploadFilePath:
+        type: string
+      publishFileName:
+        type: string
+      repo:
+        type: string
+    steps:
+      - run:
+          name: Upload << parameters.uploadFilePath >> to GitHub
+          working_directory: << parameters.working_directory >>
+          command: |
+            github-release upload --user pastelnetwork --repo << parameters.repo >> --tag $CIRCLE_TAG --name << parameters.publishFileName >> --file << parameters.uploadFilePath >>
 
 jobs:
   # Run automated tests
@@ -113,38 +166,54 @@ jobs:
           name: Install staticcheck
           command: |
             GO111MODULE=off go get -u honnef.co/go/tools/cmd/staticcheck
-      - test:
-          package: "common"
-      - test:
-          package: "pastel"
-      - test:
-          package: "tools/pastel-api"
-      - test:
-          package: "proto"
-      - test:
-          package: "legroast"
-      - test:
-          package: "dupe-detection"
-      - test:
-          package: "pqsignatures"
-      - test:
-          package: "walletnode"
-      - test:
-          package: "supernode"
 
   # Whenever we create a GitHub release, build binaries for each OS, and upload them into the release
   release:
     <<: *defaults
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.2
+          docker_layer_caching: true
       - run:
           name: Install github-release
           command: |
             GO111MODULE=off go get github.com/github-release/github-release
-      - release:
-          package: "walletnode"
-      - release:
-          package: "supernode"
+      - run:
+          name: Install xgo
+          command: |
+            go install -v github.com/pastelnetwork/xgo@48be1f35b934924c998997a8470ffdb6a022b968
+      - create-sources-container:
+          containerName: "sourcesContainer"
+      - xgo-build:
+          sourcesContainerName: "sourcesContainer"
+          buildContainerName: "pqsignatures"
+          moduleSubDir: "pqsignatures"
+          package: "cmd/pqsignatures"
+          targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
+          outputDirectory: "build"
+      - github-release:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          uploadFilePath: "pqsignatures-darwin-10.14-amd64"
+          publishFileName: "pqsignatures-darwin-amd64"
+          repo: "test-releases"
+      - github-release:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          uploadFilePath: "pqsignatures-windows-4.0-amd64.exe"
+          publishFileName: "pqsignatures-windows-amd64.exe"
+          repo: "test-releases"
+      - github-release:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          uploadFilePath: "pqsignatures-linux-amd64"
+          publishFileName: "pqsignatures-linux-amd64"
+          repo: "test-releases"
+      - xgo-build:
+          sourcesContainerName: "sourcesContainer"
+          buildContainerName: "walletnode"
+          moduleSubDir: "walletnode"
+          package: ""
+          targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
+          outputDirectory: "build"
 
 workflows:
   build-and-test:
