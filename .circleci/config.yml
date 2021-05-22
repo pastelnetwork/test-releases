@@ -113,7 +113,7 @@ commands:
         type: string
     steps:
       - run:
-          name: "<< parameters.package >>: xgo build for << parameters.targets >>"
+          name: "<< parameters.moduleSubDir >> << parameters.package >>: xgo build for << parameters.targets >>"
           command: |
             GOPATH= xgo -go go-1.16.x --targets=<< parameters.targets >>  -moduleSubDir=<< parameters.moduleSubDir >> -pkg=<< parameters.package >> -volumesFrom=<< parameters.sourcesContainerName >> -dockerRM=false -dockerContainerName=<< parameters.buildContainerName >> ./
 
@@ -228,6 +228,10 @@ jobs:
           package: ""
           targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
           outputDirectory: "build"
+      - github-upload-all-os:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          binaryName: "walletnode"
+          repo: "test-releases"
       - xgo-build:
           sourcesContainerName: "sourcesContainer"
           buildContainerName: "supernode"
@@ -235,6 +239,10 @@ jobs:
           package: ""
           targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
           outputDirectory: "build"
+      - github-upload-all-os:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          binaryName: "supernode"
+          repo: "test-releases"
 
 workflows:
   build-and-test:
