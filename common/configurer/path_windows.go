@@ -4,6 +4,7 @@ package configurer
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"syscall"
 )
@@ -14,14 +15,14 @@ const (
 )
 
 var defaultConfigPaths = []string{
-	file.Path("$HOME", beforeVistaAppDir, "Pastel"),
-	file.Path("$HOME", fromVistaAppDir, "Pastel"),
+	path.Join("$HOME", beforeVistaAppDir, "Pastel"),
+	path.Join("$HOME", fromVistaAppDir, "Pastel"),
 	".",
 }
 
 // DefaultConfigPath returns the default config path for Windows OS.
 func DefaultConfigPath(filename string) string {
-	homeDir := os.UserHomeDir()
+	homeDir, _ := os.UserHomeDir()
 	appDir := beforeVistaAppDir
 
 	v, _ := syscall.GetVersion()
