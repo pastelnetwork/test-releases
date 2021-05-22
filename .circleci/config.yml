@@ -211,6 +211,7 @@ jobs:
           sourcesContainerName: "sourcesContainer"
           buildContainerName: "walletnode"
           moduleSubDir: "walletnode"
+          package: ""
           targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
           outputDirectory: "build"
 
