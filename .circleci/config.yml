@@ -66,7 +66,14 @@ commands:
           package: << parameters.package >>
           targets: << parameters.targets >>
           outputDirectory: "build"
-
+      - run:
+          name: "<< parameters.moduleSubDir >>: Validate existence of built binaries"
+          command: |
+            export WORKING_DIR=~/project/build/github.com/pastelnetwork/gonode
+            export MACOS_ARTIFACT=$WORKING_DIR/<< parameters.binaryName >>-darwin-10.14-amd64
+            export WINDOWS_ARTIFACT=$WORKING_DIR/<< parameters.binaryName >>-windows-4.0-amd64.exe
+            export LINUX_ARTIFACT=$WORKING_DIR/<< parameters.binaryName >>-linux-amd64
+            test -f $MACOS_ARTIFACT  && test -f $WINDOWS_ARTIFACT && test -f $LINUX_ARTIFACT
   release:
     parameters:
       buildContainerName:
