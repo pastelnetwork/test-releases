@@ -138,6 +138,31 @@ commands:
           command: |
             github-release upload --user pastelnetwork --repo << parameters.repo >> --tag $CIRCLE_TAG --name << parameters.publishFileName >> --file << parameters.uploadFilePath >>
 
+  github-upload-all-os:
+    parameters:
+      working_directory:
+        type: string
+      binaryName:
+        type: string
+      repo:
+        type: string
+    steps:
+      - github-release:
+          working_directory: << parameters.working_directory >>
+          uploadFilePath: << parameters.binaryName >>-darwin-10.14-amd64
+          publishFileName: << parameters.binaryName >>-darwin-amd64
+          repo: << parameters.repo >>
+      - github-release:
+          working_directory: << parameters.working_directory >>
+          uploadFilePath: << parameters.binaryName >>-windows-4.0-amd64.exe
+          publishFileName: << parameters.binaryName >>-windows-amd64.exe
+          repo: << parameters.repo >>
+      - github-release:
+          working_directory: << parameters.working_directory >>
+          uploadFilePath: << parameters.binaryName >>-linux-amd64
+          publishFileName: << parameters.binaryName >>-linux-amd64
+          repo: << parameters.repo >>
+
 jobs:
   # Run automated tests
   test:
@@ -192,25 +217,21 @@ jobs:
           package: "cmd/pqsignatures"
           targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
           outputDirectory: "build"
-      - github-release:
+      - github-upload-all-os:
           working_directory: "~/project/build/github.com/pastelnetwork/gonode"
-          uploadFilePath: "pqsignatures-darwin-10.14-amd64"
-          publishFileName: "pqsignatures-darwin-amd64"
-          repo: "test-releases"
-      - github-release:
-          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
-          uploadFilePath: "pqsignatures-windows-4.0-amd64.exe"
-          publishFileName: "pqsignatures-windows-amd64.exe"
-          repo: "test-releases"
-      - github-release:
-          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
-          uploadFilePath: "pqsignatures-linux-amd64"
-          publishFileName: "pqsignatures-linux-amd64"
+          binaryName: "pqsignatures"
           repo: "test-releases"
       - xgo-build:
           sourcesContainerName: "sourcesContainer"
           buildContainerName: "walletnode"
           moduleSubDir: "walletnode"
+          package: ""
+          targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
+          outputDirectory: "build"
+      - xgo-build:
+          sourcesContainerName: "sourcesContainer"
+          buildContainerName: "supernode"
+          moduleSubDir: "supernode"
           package: ""
           targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
           outputDirectory: "build"
