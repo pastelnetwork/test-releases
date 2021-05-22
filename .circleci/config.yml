@@ -197,6 +197,22 @@ jobs:
           uploadFilePath: "pqsignatures-darwin-10.14-amd64"
           publishFileName: "pqsignatures-darwin-amd64"
           repo: "test-releases"
+      - github-release:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          uploadFilePath: "pqsignatures-windows-4.0-amd64.exe"
+          publishFileName: "pqsignatures-windows-amd64.exe"
+          repo: "test-releases"
+      - github-release:
+          working_directory: "~/project/build/github.com/pastelnetwork/gonode"
+          uploadFilePath: "pqsignatures-linux-amd64"
+          publishFileName: "pqsignatures-linux-amd64"
+          repo: "test-releases"
+      - xgo-build:
+          sourcesContainerName: "sourcesContainer"
+          buildContainerName: "walletnode"
+          moduleSubDir: "walletnode"
+          targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
+          outputDirectory: "build"
 
 workflows:
   build-and-test:
