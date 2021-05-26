@@ -395,5 +395,3 @@ workflows:
           requires:
             - test_walletnode
             - test_supernode
-          context:
-            - Release
