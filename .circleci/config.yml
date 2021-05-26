@@ -354,7 +354,7 @@ jobs:
           buildContainerName: "supernode"
           moduleSubDir: "supernode"
           package: ""
-          targets: "linux/amd64,darwin-10.14/amd64,windows/amd64,"
+          targets: "linux/amd64,"
           binaryName: "supernode"
 
 workflows:
@@ -401,7 +401,7 @@ workflows:
           requires:
             - prepare_workspace
       - release:
-          # Reminder: All required jobs to run on git tags should have filters tags value
+          # Reminder: All jobs in "requires" section to run on git tags should have "filters: tags:" value explicitly set
           requires:
             - test_walletnode
             - test_supernode
