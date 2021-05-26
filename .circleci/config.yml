@@ -388,13 +388,20 @@ workflows:
       - test_walletnode:
           requires:
             - prepare_workspace
+          filters:
+            tags:
+              only: /^v.*/
       - test_supernode:
           requires:
             - prepare_workspace
+          filters:
+            tags:
+              only: /^v.*/
       - build:
           requires:
             - prepare_workspace
       - release:
+          # Reminder: All required jobs to run on git tags should have filters tags value
           requires:
             - test_walletnode
             - test_supernode
