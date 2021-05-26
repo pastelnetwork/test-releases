@@ -361,7 +361,7 @@ workflows:
   build-and-test:
     jobs:
       - prepare_workspace:
-        filters:
+          filters:
             tags:
               only: /^v.*/
       - test_common:
