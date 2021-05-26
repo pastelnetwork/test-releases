@@ -360,7 +360,10 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - prepare_workspace
+      - prepare_workspace:
+          filters:
+            tags:
+              only: /^v.*/
       - test_common:
           requires:
             - prepare_workspace
@@ -394,3 +397,6 @@ workflows:
       - release-job:
           requires:
             - prepare_workspace
+          filters:
+            tags:
+              only: /^v.*/
