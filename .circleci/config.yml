@@ -321,7 +321,7 @@ jobs:
           binaryName: "walletnode"
 
   # Whenever we create a GitHub release, build binaries for each OS, and upload them into the release
-  release:
+  release-job:
     <<: *defaults
     steps:
       - checkout
@@ -391,7 +391,6 @@ workflows:
       - build:
           requires:
             - prepare_workspace
-      - release:
+      - release-job:
           requires:
-            - test_walletnode
-            - test_supernode
+            - prepare_workspace
