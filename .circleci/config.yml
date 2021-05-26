@@ -78,15 +78,15 @@ commands:
             export LINUX_ARTIFACT=$WORKING_DIR/<< parameters.binaryName >>-linux-amd64
             if [[ "<< parameters.targets >>" == *"linux/amd64,"* ]]; then
               echo "Check existence of linux/amd64 build"
-              test -f $LINUX_ARTIFACT
+              test -f $LINUX_ARTIFACT || (echo "$LINUX_ARTIFACT is not found" && exit 1)
             fi
             if [[ "<< parameters.targets >>" == *"darwin-10.14/amd64,"* ]]; then
               echo "Check existence of darwin-10.14/amd64 build"
-              test -f $MACOS_ARTIFACT
+              test -f $MACOS_ARTIFACT || (echo "$MACOS_ARTIFACT is not found" && exit 1)
             fi
             if [[ "<< parameters.targets >>" == *"windows/amd64,"* ]]; then
               echo "Check existence of windows/amd64 build"
-              test -f $WINDOWS_ARTIFACT
+              test -f $WINDOWS_ARTIFACT || (echo "$WINDOWS_ARTIFACT is not found" && exit 1)
             fi
   release:
     parameters:
