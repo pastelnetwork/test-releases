@@ -395,10 +395,5 @@ workflows:
           requires:
             - test_walletnode
             - test_supernode
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /^v.*/
           context:
             - Release
