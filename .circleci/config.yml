@@ -164,9 +164,6 @@ commands:
           name: Upload << parameters.targets >> to << parameters.repo >> GitHub repo
           working_directory: << parameters.working_directory >>
           command: |
-            - run:
-          name: "<< parameters.moduleSubDir >>: Validate existence of built binaries"
-          command: |
             export MACOS_ARTIFACT=<< parameters.binaryName >>-darwin-10.14-amd64
             export WINDOWS_ARTIFACT=<< parameters.binaryName >>-windows-4.0-amd64.exe
             export LINUX_ARTIFACT=<< parameters.binaryName >>-linux-amd64
